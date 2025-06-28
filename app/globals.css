@@ -24,12 +24,125 @@ body {
   height: 100dvh;
 
   display: flex;
-  justify-content: center;
+
+  flex-direction: column;
+
+  justify-content: start;
   align-items: center;
 
   border-radius: 0px 32px 32px 0px;
 
   z-index: 100000;
+}
+
+.form-group {
+  position: relative;
+  width: 66%;
+  margin-bottom: 1.5rem;
+}
+
+/* Input field */
+.form-group input {
+  width: 100%;
+  padding: 18px 8px 8px;
+  font-size: 16px;
+  border: none;
+  border-bottom: 2px solid white;
+  background-color: transparent;
+  color: white;
+  outline: none;
+}
+
+/* Label style */
+.form-group label {
+  position: absolute;
+  left: 8px;
+  top: 12px;
+  color: white;
+  font-size: 16px;
+  pointer-events: none;
+  transition: 0.2s ease all;
+}
+
+/* Animate label when input is focused or not empty */
+.form-group input:focus + label,
+.form-group input:not(:placeholder-shown) + label {
+  top: -6px;
+  font-size: 12px;
+  color: #00bcd4; /* Highlight color */
+}
+
+.toggleIcon {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  user-select: none;
+}
+
+.terms-container {
+  padding-top: 20px;
+  width: 66%;
+}
+
+.checkbox-label {
+  color: white;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.checkbox-input {
+  display: none;
+}
+
+.checkbox-custom {
+  width: 18px;
+  height: 18px;
+  border: 2px solid white;
+  display: inline-block;
+  margin-right: 8px;
+  border-radius: 3px;
+  position: relative;
+
+  
+}
+
+.checkbox-input:checked + .checkbox-custom {
+  background-color: #ffffff;
+  border-color: #ffffff;
+}
+
+.summit-conatianer{
+  margin-top: 137px;
+}
+
+.summit-conatianer button{
+  padding: 20px;
+  width: 200px;
+  height: 35px;
+  background-color: #C4DAD2;
+  border-radius: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #16423C;
+
+  transition: all .3s;
+}
+
+.summit-conatianer button:hover{
+  background-color: #598575;
+  color: #ffffff;
+}
+
+.summit-conatianer button:active{
+  background-color: #132e24;
+  color: #ffffff;
 }
 
 @media (max-width: 768px) {
@@ -42,8 +155,8 @@ body {
 
   }
 
-}
+  .form-group{
+    width: 66%;
+  }
 
-.input-field{
-  
 }
