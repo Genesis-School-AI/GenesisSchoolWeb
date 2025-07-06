@@ -1,6 +1,50 @@
 'use client';
+import { useState, useEffect } from 'react';
 
-export default function Sidebar({ onClose, userSession, onLogout }) {
+export default function Sidebar({ onClose, userSession, onLogout, selectedSubject, onSubjectChange }) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Animation effect when component mounts
+  useEffect(() => {
+    // Small delay to ensure CSS transition works
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 10);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleClose = () => {
+    setIsVisible(false);
+    // Delay the actual close to allow animation to complete
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
+
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      handleClose();
+    }
+  };
+  const subjects = [
+    { id: 'bio', name: 'ชีวะวิทยา' },
+    { id: 'thai', name: 'ไทย' },
+    { id: 'math', name: 'คณิต' },
+    { id: 'phy', name: 'ฟิสิกส์' },
+    { id: 'chem', name: 'เคมี' },
+    { id: 'eng', name: 'อังกฤษ' },
+    { id: 'social', name: 'สังคม' },
+    { id: 'com', name: 'คอมพิวเตอร์' },
+    { id: 'history', name: 'ประวัติศาสตร์' }
+  ];
+
+  const handleSubjectChange = (e) => {
+    const newSubject = e.target.value;
+    if (onSubjectChange) {
+      onSubjectChange(newSubject);
+    }
+  };
   const handleLogout = async () => {
     try {
       // Show loading state
@@ -46,27 +90,51 @@ export default function Sidebar({ onClose, userSession, onLogout }) {
   };
 
   return (
-    <div className="sidebar">
-      <button onClick={onClose}>✖</button>
-      <h2 className="mt-3 text-xl">ข้อมูลผู้ใช้</h2>
+    <>
+      {/* Overlay for dimming background */}
+      <div 
+        className={`sidebar-overlay ${isVisible ? 'show' : ''}`}
+        onClick={handleOverlayClick}
+      />
       
-      {userSession ? (
-        <div className="user-info">
-          <p><strong>ชื่อ:</strong> {userSession.ufname} {userSession.ulname}</p>
-          <p><strong>รหัสนักเรียน:</strong> {userSession.ustudent_id}</p>
-          <p><strong>ห้อง:</strong> {userSession.uroom_id}</p>
-          <p><strong>ปีการศึกษา:</strong> {userSession.uyear_id}</p>
+      {/* Sidebar with sliding animation */}
+      <div className={`sidebar ${isVisible ? 'show' : ''}`}>
+        <button onClick={handleClose}>✖</button>
+        <h2 className="mt-3 text-xl">ข้อมูลผู้ใช้</h2>
+        
+        {userSession ? (
+          <div className="user-info">
+            <p><strong>ชื่อ:</strong> {userSession.ufname} {userSession.ulname}</p>
+            <p><strong>รหัสนักเรียน:</strong> {userSession.ustudent_id}</p>
+            <p><strong>ห้อง:</strong> {userSession.uroom_id}</p>
+            <p><strong>ปีการศึกษา:</strong> {userSession.uyear_id}</p>
+          </div>
+        ) : (
+          <p>กำลังโหลดข้อมูลผู้ใช้...</p>
+        )}
+
+        <div className="subject-selection">
+          <h3 className="text-lg mb-2">เลือกวิชา</h3>
+          <select 
+            value={selectedSubject} 
+            onChange={handleSubjectChange}
+            className="subject-dropdown"
+          >
+            {subjects.map((subject) => (
+              <option key={subject.id} value={subject.id}>
+                {subject.name}
+              </option>
+            ))}
+          </select>
         </div>
-      ) : (
-        <p>กำลังโหลดข้อมูลผู้ใช้...</p>
-      )}
-      
-      <button 
-        onClick={handleLogout}
-        className="logout-btn"
-      >
-        ออกจากระบบ
-      </button>
-    </div>
+        
+        <button 
+          onClick={handleLogout}
+          className="logout-btn"
+        >
+          ออกจากระบบ
+        </button>
+      </div>
+    </>
   );
 }
