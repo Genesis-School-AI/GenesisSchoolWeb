@@ -1,73 +1,148 @@
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
-import Image from 'next/image';
+// pages/index.js
+'use client';
+import { useState, useEffect, useRef } from 'react';
+import Sidebar from './components/Sidebar';
+import InfoPopup from './components/InfoPopup';
+import ChatMessage from './components/ChatMessage';
 
-export default async function Home() {
-  const cookieStore = await cookies();
-  const userSession = cookieStore.get('user_session');
+export default function Home() {
+       const [showSidebar, setShowSidebar] = useState(false);
+       const [showInfo, setShowInfo] = useState(false);
+       const [messages, setMessages] = useState([]);
+       const [input, setInput] = useState('');
+       const [loading, setLoading] = useState(false);
+       const [userSession, setUserSession] = useState(null);
+       const chatBoxRef = useRef(null);
 
-  if (!userSession) {
-    redirect('/login');
-  }
+       // Fetch user session on component mount
+       useEffect(() => {
+              const fetchUserSession = async () => {
+                     try {
+                            const response = await fetch('/api/user-session');
+                            if (response.ok) {
+                                   const userData = await response.json();
+                                   setUserSession(userData);
+                            } else {
+                                   console.error('No user session found');
+                                   // Optionally redirect to login page
+                                   // window.location.href = '/login';
+                            }
+                     } catch (error) {
+                            console.error('Error fetching user session:', error);
+                     }
+              };
+              
+              fetchUserSession();
+       }, []);
 
-  let user;
-  try {
-    user = JSON.parse(userSession.value);
-  } catch {
-    redirect('/login');
-  }
+       // Auto-scroll to bottom when new messages are added
+       useEffect(() => {
+              if (chatBoxRef.current) {
+                     chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+              }
+       }, [messages]);
 
-  const handleLogout = async () => {
-    'use server';
-    const cookieStore = await cookies();
-    cookieStore.delete('user_session');
-    redirect('/login');
-  };
+       const handleSend = async () => {
+              if (!input.trim()) return;
+              
+              // Check if user session is available
+              if (!userSession) {
+                     setMessages((prev) => [...prev, { 
+                            type: 'system', 
+                            text: 'กรุณาเข้าสู่ระบบก่อนใช้งาน' 
+                     }]);
+                     return;
+              }
+              
+              const userMessage = { type: 'user', text: input };
+              setMessages((prev) => [...prev, userMessage]);
+              const userPrompt = input;
+              setInput('');
+              setMessages((prev) => [...prev, { type: 'system', text: 'Sending API...' }]);
+              setLoading(true);
 
-  return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-md mx-auto bg-gray-300 rounded-lg shadow-md p-6">
-        <h1 className="text-2xl font-bold mb-6 text-center">ข้อมูลผู้ใช้</h1>
-        
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">ชื่อ-นามสกุล</label>
-            <p className="mt-1 text-lg">{user.ufname} {user.ulname}</p>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700">รหัสนักเรียน</label>
-            <p className="mt-1 text-lg">{user.ustudent_id}</p>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700">ห้อง</label>
-            <p className="mt-1 text-lg">ห้อง {user.uroom_id}</p>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700">ชั้นปี</label>
-            <p className="mt-1 text-lg">ปี {user.uyear_id}</p>
-          </div>
-        </div>
+              try {
+                     // API call through Next.js proxy route to avoid CORS issues
+                     const response = await fetch('/api/fetch-response', {
+                            method: 'POST',
+                            headers: {
+                                   'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                   k: 10,
+                                   room_id: userSession.uroom_id,
+                                   year_id: userSession.uyear_id,
+                                   subject_id: "bio",
+                                   prompt: userPrompt
+                            })
+                     });
 
-        <Image
-          src="/icon/eye-solid.svg"
-               alt="User Icon"
-               width={100}
-                     height={100}
-               className="mx-auto mt-6 mb-4"
-              />
+                     if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                     }
 
-        <form action={handleLogout} className="mt-6">
-          <button 
-            type="submit"
-            className="w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition-colors"
-          >
-            ออกจากระบบ
-          </button>
-        </form>
-      </div>
-    </div>
-  );
+                     const data = await response.json();
+                     
+                     setMessages((prev) => [
+                            ...prev.slice(0, -1),
+                            { type: 'ai', text: data.data || 'No response data received' },
+                     ]);
+                     
+              } catch (error) {
+                     console.error('Error fetching response:', error);
+                     setMessages((prev) => [
+                            ...prev.slice(0, -1),
+                            { type: 'system', text: `Error: ${error.message}. Please check if the API server is running.` },
+                     ]);
+              } finally {
+                     setLoading(false);
+              }
+       };
+
+       const handleLogout = () => {
+              // Clear user session state
+              setUserSession(null);
+              setMessages([]);
+              setInput('');
+       };
+
+       return (
+              <div className="page-container">
+                     <button className="menuBtn" onClick={() => setShowSidebar(true)}>☰</button>
+                     <h1 className="header">Thoth</h1>
+                     <button className="infoBtn" onClick={() => setShowInfo(true)}>i</button>
+
+                     {showSidebar && <Sidebar onClose={() => setShowSidebar(false)} userSession={userSession} onLogout={handleLogout} />}
+                     {showInfo && <InfoPopup onClose={() => setShowInfo(false)} />}
+
+                     <div className="chatBox" ref={chatBoxRef}>
+                            {messages.map((msg, i) => (
+                                   <ChatMessage key={i} type={msg.type} text={msg.text} />
+                            ))}
+                     </div>
+
+                     <div className="inputSection">
+                            <div className="inputContainer">
+                                   <input
+                                          value={input}
+                                          onChange={(e) => setInput(e.target.value)}
+                                          onKeyPress={(e) => {
+                                                 if (e.key === 'Enter' && !loading) {
+                                                        handleSend();
+                                                 }
+                                          }}
+                                          placeholder="พิมพ์ข้อความของคุณที่นี่"
+                                          disabled={loading}
+                                   />
+                                   <button 
+                                          onClick={handleSend} 
+                                          className={`sendBtn ${loading ? 'loading' : ''}`}
+                                          disabled={loading || !input.trim()}
+                                   >
+                                          {loading ? '⏳' : '↥'}
+                                   </button>
+                            </div>
+                     </div>
+              </div>
+       );
 }
