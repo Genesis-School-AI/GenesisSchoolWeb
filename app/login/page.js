@@ -42,7 +42,7 @@ export default function  Home() {
 
                                           <span className="toggleIcon absolute right-3 top-1/2 transform-translate-y-1/2 cursor-pointer text-white" onClick={togglePassword}>
                                                  <Image 
-                                                        src={showPassword ? '/icon/eye-slash-solid.svg' : '/icon/eye-solid.svg'}
+                                                        src={showPassword ? '/icon/eye-slash-solid-blue.svg' : '/icon/eye-solid-blue.svg'}
                                                         alt={showPassword ? 'Hide password' : 'Show password'}
                                                         width={20}
                                                         height={20}
