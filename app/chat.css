@@ -67,6 +67,26 @@
        font-weight: 500;
 }
 
+.quiz-nav-btn {
+       background: linear-gradient(135deg, #66bb6a, #4caf50);
+       border: none;
+       color: white;
+       padding: 8px 16px;
+       border-radius: 20px;
+       font-size: 14px;
+       font-weight: 600;
+       cursor: pointer;
+       margin-top: 10px;
+       transition: all 0.3s ease;
+       box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.quiz-nav-btn:hover {
+       background: linear-gradient(135deg, #5cb85c, #43a047);
+       transform: translateY(-1px);
+       box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
 .chatBox {
        width: 1200px;
        margin: 0 auto;

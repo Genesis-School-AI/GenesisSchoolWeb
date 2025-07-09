@@ -1,5 +1,6 @@
 import "./globals.css";
 import "./chat.css";
+import "./quizz.css";
 import localFont from "next/font/local";
 
 const myFont = localFont({

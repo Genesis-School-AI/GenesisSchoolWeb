@@ -1,12 +1,14 @@
 // pages/index.js
 'use client';
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import Sidebar from './components/Sidebar';
 import InfoPopup from './components/InfoPopup';
 import ChatMessage from './components/ChatMessage';
 import Image from 'next/image';
 
 export default function Home() {
+       const router = useRouter();
        const [showSidebar, setShowSidebar] = useState(false);
        const [showInfo, setShowInfo] = useState(false);
        const [messages, setMessages] = useState([]);
@@ -101,8 +103,11 @@ export default function Home() {
                      
                      // Handle different response structures
                      let aiResponse = '';
-                     if (data.message && data.message.content) {
-                            // New Ollama-style structure with message object
+                     if (data.data && data.data.content) {
+                            // New structure with data.data.content
+                            aiResponse = data.data.content;
+                     } else if (data.message && data.message.content) {
+                            // Ollama-style structure with message object
                             aiResponse = data.message.content;
                      } else if (data.data) {
                             // Original expected structure
@@ -165,6 +170,10 @@ export default function Home() {
               return subjects[subjectId] || subjectId;
        };
 
+       const handleQuizNavigation = () => {
+              router.push('/quizz');
+       };
+
        return (
               <div className="page-container">
                      <button className="menuBtn ml-[4px]" onClick={() => setShowSidebar(true)}>
@@ -173,6 +182,9 @@ export default function Home() {
                      <div className="header-content">
                             <h1 className="header">Thoth</h1>
                             <p className="current-subject">วิชา: {getSubjectName(selectedSubject)}</p>
+                            <button className="quiz-nav-btn" onClick={handleQuizNavigation}>
+                                   ทำแบบทดสอบ
+                            </button>
                      </div>
                      <button className="infoBtn mr-[4px]" onClick={() => setShowInfo(true)}>
                             <Image src="\icon\circle-info-solid.svg" alt="Menu" width={24} height={24} />
