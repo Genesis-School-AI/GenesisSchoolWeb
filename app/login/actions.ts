@@ -29,9 +29,10 @@ export async function login(formData: FormData) {
       return { error: 'รหัสนักเรียนหรือรหัสผ่านไม่ถูกต้อง' };
     }
 
-    // Set session cookie
+    // Set session cookie (add uid for use as muid)
     cookieStore.set('user_session', JSON.stringify({
-      id: user.id,
+      id: user.id, // keep for backward compatibility
+      uid: user.id, // explicitly set uid for use as muid
       ufname: user.ufname,
       ulname: user.ulname,
       ustudent_id: user.ustudent_id,

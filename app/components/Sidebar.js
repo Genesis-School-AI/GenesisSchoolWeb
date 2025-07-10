@@ -37,6 +37,7 @@ export default function Sidebar({ onClose, userSession, onLogout, selectedSubjec
               { id: 'english', name: 'อังกฤษ' },
               { id: 'social', name: 'สังคม' },
               { id: 'history', name: 'ประวัติศาสตร์' }
+              , { id: 'com', name: 'คอมพิวเตอร์' }
        ];
 
        const handleSubjectChange = (e) => {

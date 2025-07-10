@@ -12,11 +12,13 @@ export default function Home() {
        const [showSidebar, setShowSidebar] = useState(false);
        const [showInfo, setShowInfo] = useState(false);
        const [messages, setMessages] = useState([]);
+       const [chatHistory, setChatHistory] = useState([]);
        const [input, setInput] = useState('');
        const [loading, setLoading] = useState(false);
        const [userSession, setUserSession] = useState(null);
        const [selectedSubject, setSelectedSubject] = useState('bio'); // Default to biology
        const chatBoxRef = useRef(null);
+       const HISTORY_COUNT = 3; // Default history count
 
        // Load saved subject from localStorage on mount
        useEffect(() => {
@@ -36,6 +38,8 @@ export default function Home() {
                             if (response.ok) {
                                    const userData = await response.json();
                                    setUserSession(userData);
+                                   // Load chat history after getting user session
+                                   loadChatHistory();
                             } else {
                                    console.error('No user session found');
                                    // Optionally redirect to login page
@@ -70,6 +74,99 @@ export default function Home() {
               };
        }, [showSidebar]);
 
+       // Load chat history from the database
+       const loadChatHistory = async () => {
+              try {
+                     const response = await fetch('/api/chat-history');
+                     if (response.ok) {
+                            const data = await response.json();
+                            if (data.success && data.messages) {
+                                   // Process messages to create chat history (prompt/respond in one row)
+                                   const processedHistory = data.messages.map(msg => ({
+                                          user: msg.mtext,
+                                          ai: msg.mrespond
+                                   }));
+                                   setChatHistory(processedHistory);
+                                   // Display last 10 messages in the chat interface
+                                   displayRecentMessages(data.messages);
+                            }
+                     }
+              } catch (error) {
+                     console.error('Error loading chat history:', error);
+              }
+       };
+
+       // Display recent messages in the chat interface
+       const displayRecentMessages = (dbMessages) => {
+              // Show both prompt and respond from each row
+              const displayMessages = [];
+              for (let i = 0; i < dbMessages.length; i++) {
+                     const msg = dbMessages[i];
+                     if (msg.mtext) {
+                            displayMessages.push({ type: 'user', text: msg.mtext });
+                     }
+                     if (msg.mrespond) {
+                            displayMessages.push({ type: 'ai', text: msg.mrespond });
+                     }
+              }
+              setMessages(displayMessages);
+       };
+
+       // Prepare chat history for API request (last N conversations)
+       const prepareChatHistoryForAPI = () => {
+              const historyForAPI = {};
+              const availableHistory = Math.min(chatHistory.length, HISTORY_COUNT);
+              
+              // Use only the history we have if it's less than the requirement
+              const startIndex = Math.max(0, chatHistory.length - availableHistory);
+              const recentHistory = chatHistory.slice(startIndex);
+              
+              recentHistory.forEach((conversation, index) => {
+                     historyForAPI[conversation.user] = conversation.ai;
+              });
+              
+              return historyForAPI;
+       };
+
+       // Save new conversation to database
+       const saveChatHistory = async (userPrompt, aiResponse) => {
+              try {
+                     const response = await fetch('/api/chat-history', {
+                            method: 'POST',
+                            headers: {
+                                   'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                   userPrompt,
+                                   aiResponse
+                            })
+                     });
+                     
+                     if (response.ok) {
+                            // Update local chat history
+                            setChatHistory(prev => [...prev, { user: userPrompt, ai: aiResponse }]);
+                     }
+              } catch (error) {
+                     console.error('Error saving chat history:', error);
+              }
+       };
+
+       // Clear all chat history
+       const clearChatHistory = async () => {
+              try {
+                     const response = await fetch('/api/chat-history', {
+                            method: 'DELETE'
+                     });
+                     
+                     if (response.ok) {
+                            setChatHistory([]);
+                            setMessages([]);
+                     }
+              } catch (error) {
+                     console.error('Error clearing chat history:', error);
+              }
+       };
+
        const handleSend = async () => {
               if (!input.trim()) return;
               
@@ -90,6 +187,30 @@ export default function Home() {
               setLoading(true);
 
               try {
+                     // Prepare last 3 recent chat history (prompt+respond)
+                     const historyForAPI = {};
+                     const availableHistory = Math.min(chatHistory.length, 3);
+                     const startIndex = Math.max(0, chatHistory.length - availableHistory);
+                     const recentHistory = chatHistory.slice(startIndex);
+                     recentHistory.forEach((conversation, idx) => {
+                            if (conversation.user && conversation.ai) {
+                                   historyForAPI[conversation.user] = conversation.ai;
+                            }
+                     });
+
+                     // Debugger: log the last 3 chat pairs
+                     console.debug('Last 3 chat history (prompt/respond):', recentHistory);
+
+                     // Add history into the prompt string
+                     let promptWithHistory = '';
+                     if (Object.keys(historyForAPI).length > 0) {
+                            Object.entries(historyForAPI).forEach(([user, ai], idx) => {
+                                   promptWithHistory += `ประวัติแชทล่าสุด ${idx + 1}:\nผู้ใช้: ${user}\nตอบกลับ: ${ai}\n`;
+                            });
+                            promptWithHistory += `\n`; // Separate from new prompt
+                     }
+                     promptWithHistory += "|| Currentprompt : " + userPrompt;
+
                      // API call through Next.js proxy route to avoid CORS issues
                      const response = await fetch('/api/fetch-response', {
                             method: 'POST',
@@ -101,12 +222,12 @@ export default function Home() {
                                    room_id: userSession.uroom_id,
                                    year_id: userSession.uyear_id,
                                    subject_id: selectedSubject,
-                                   prompt: userPrompt
+                                   prompt: promptWithHistory // Add history into prompt
                             })
                      });
 
                      if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status} - Fetch data {room_id : ${userSession.uroom_id}, room_id : ${userSession.uyear_id}, subject_id : ${selectedSubject}, prompt : ${userPrompt}}`);
+                            throw new Error(`HTTP error! status: ${response.status} - Fetch data {room_id : ${userSession.uroom_id}, room_id : ${userSession.uyear_id}, subject_id : ${selectedSubject}, prompt : ${promptWithHistory}}`);
                      }
 
                      const data = await response.json();
@@ -139,6 +260,11 @@ export default function Home() {
                             { type: 'ai', text: aiResponse || 'No response content received' },
                      ]);
                      
+                     // Save conversation to database
+                     if (aiResponse) {
+                            await saveChatHistory(userPrompt, aiResponse);
+                     }
+                     
               } catch (error) {
                      console.error('Error fetching response:', error);
                      setMessages((prev) => [
@@ -154,6 +280,7 @@ export default function Home() {
               // Clear user session state
               setUserSession(null);
               setMessages([]);
+              setChatHistory([]);
               setInput('');
        };
 
@@ -175,7 +302,9 @@ export default function Home() {
                      'chemistry': 'เคมี',
                      'english': 'อังกฤษ',
                      'social': 'สังคม',
-                     'history': 'ประวัติศาสตร์'
+                     'history': 'ประวัติศาสตร์',
+                     'com': 'คอมพิวเตอร์',
+
               };
               return subjects[subjectId] || subjectId;
        };

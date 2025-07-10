@@ -2,12 +2,23 @@ export async function POST(request) {
     try {
         const body = await request.json();
         
-        const response = await fetch('http://127.0.0.1:8690/fetch-geminia', {
+        // Extract chat history and new prompt from the body
+        const { chatHistory, newPrompt, ...otherParams } = body;
+        
+        // Prepare the request body with chat history
+        const requestBody = {
+            ...otherParams,
+            chathistory: chatHistory || {},
+            newprompt: newPrompt || body.prompt
+        };
+        
+        const response = await fetch('http://127.0.0.1:8690/fetch-gemini', {
+       //  const response = await fetch('http://127.0.0.1:8690/fetch-response', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(body)
+            body: JSON.stringify(requestBody)
         });
 
         if (!response.ok) {

@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Sidebar from '../components/Sidebar';
+import InfoPopup from '../components/InfoPopup';
+
 import '../quizz.css';
 
 const apiKey = process.env.GEMINI_API_KEY;
@@ -25,6 +27,8 @@ export default function QuizPage() {
        const [questionResults, setQuestionResults] = useState([]); // Store detailed results for each question
        const [retryCount, setRetryCount] = useState(0); // Track retry attempts
        const [errorMessage, setErrorMessage] = useState(''); // Store error messages
+       const [showInfo, setShowInfo] = useState(false);
+
 
        // Load saved subject from localStorage on mount
        useEffect(() => {
@@ -82,7 +86,7 @@ export default function QuizPage() {
                                    'Content-Type': 'application/json',
                             },
                             body: JSON.stringify({
-                                   k: 1,
+                                   k: 3,
                                    room_id: session.uroom_id,
                                    year_id: session.uyear_id,
                                    subject_id: selectedSubject,
@@ -374,7 +378,8 @@ export default function QuizPage() {
                      'chemistry': 'เคมี',
                      'english': 'อังกฤษ',
                      'social': 'สังคม',
-                     'history': 'ประวัติศาสตร์'
+                     'history': 'ประวัติศาสตร์',
+                     'com': 'คอมพิวเตอร์',
               };
               return subjects[subjectId] || subjectId;
        };
@@ -713,13 +718,16 @@ export default function QuizPage() {
                             onSubjectChange={handleSubjectChange}
                      />}
 
+                     {/* info */}
+                     {showInfo && <InfoPopup onClose={() => setShowInfo(false)} />}
+
                      {/* Header */}
                      <div className="quiz-header">
                             <button className="quiz-menu-btn z-[9999]"  onClick={() => setShowSidebar(true)}>
                                    <Image src="/icon/bars-solid.svg" alt="Menu" width={24} height={24} />
                             </button>
                             <h1 className="quiz-title">Thoth</h1>
-                            <button className="quiz-info-btn">
+                            <button className="quiz-info-btn" onClick={() => setShowInfo(true)}>
                                    <Image src="/icon/circle-info-solid.svg" alt="Info" width={24} height={24} />
                             </button>
                      </div>
