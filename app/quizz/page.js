@@ -26,6 +26,16 @@ export default function QuizPage() {
        const [retryCount, setRetryCount] = useState(0); // Track retry attempts
        const [errorMessage, setErrorMessage] = useState(''); // Store error messages
 
+       // Load saved subject from localStorage on mount
+       useEffect(() => {
+              if (typeof window !== 'undefined') {
+                     const savedSubject = localStorage.getItem('selectedSubject');
+                     if (savedSubject) {
+                            setSelectedSubject(savedSubject);
+                     }
+              }
+       }, []);
+
        // Fetch user session on component mount
        useEffect(() => {
               const fetchUserSession = async () => {
@@ -34,8 +44,6 @@ export default function QuizPage() {
                             if (response.ok) {
                                    const userData = await response.json();
                                    setUserSession(userData);
-                                   // Fetch all questions after getting user session
-                                   await fetchAllQuestions(userData);
                             } else {
                                    console.error('No user session found');
                                    setInitialLoading(false);
@@ -48,6 +56,13 @@ export default function QuizPage() {
 
               fetchUserSession();
        }, []);
+
+       // Fetch questions when both user session and selected subject are available
+       useEffect(() => {
+              if (userSession && selectedSubject) {
+                     fetchAllQuestions(userSession);
+              }
+       }, [userSession, selectedSubject]);
 
        // Update selected answer when current question changes
        useEffect(() => {
@@ -335,6 +350,10 @@ export default function QuizPage() {
 
        const handleSubjectChange = (newSubject) => {
               setSelectedSubject(newSubject);
+              // Save to localStorage for persistence
+              if (typeof window !== 'undefined') {
+                     localStorage.setItem('selectedSubject', newSubject);
+              }
               // Reset quiz when subject changes
               setQuestionNumber(1);
               setCurrentQuestionIndex(0);
@@ -343,7 +362,7 @@ export default function QuizPage() {
               setScore(0);
               setRetryCount(0);
               setErrorMessage('');
-              fetchAllQuestions();
+              // fetchAllQuestions will be called automatically by the useEffect
        };
 
        const getSubjectName = (subjectId) => {
@@ -572,7 +591,7 @@ export default function QuizPage() {
                      ]
               };
 
-              return questionSets[subject] || questionSets['bio']; // Default to biology if subject not found
+              return questionSets[subject] || questionSets['chemistry']; // Default to biology if subject not found
        };
 
        const sanitizeText = (text) => {
@@ -619,16 +638,16 @@ export default function QuizPage() {
 
                      {/* Quiz Completed - Score Board */}
                      {quizCompleted && (
-                            <div className="score-popup">
-                                   <div className="score-popup-content">
+                            <div className="score-popup ">
+                                   <div className="score-popup-content ">
                                           <h2>🎉 ผลการทำแบบทดสอบ</h2>
                                           <div className="score-display">
                                                  <div className="score-number">{score}</div>
                                                  <div className="score-total">/ {totalQuestions}</div>
                                           </div>
-                                          <div className="score-percentage">
+                                          {/* <div className="score-percentage">
                                                  {Math.round((score / totalQuestions) * 100)}%
-                                          </div>
+                                          </div> */}
                                           <div className="score-message">
                                                  {score === totalQuestions ? "🌟 ยอดเยี่ยม! คุณได้คะแนนเต็ม!" :
                                                         score >= totalQuestions * 0.8 ? "👏 เก่งมาก! คุณมีความเข้าใจดี" :
@@ -696,7 +715,7 @@ export default function QuizPage() {
 
                      {/* Header */}
                      <div className="quiz-header">
-                            <button className="quiz-menu-btn" onClick={() => setShowSidebar(true)}>
+                            <button className="quiz-menu-btn z-[9999]"  onClick={() => setShowSidebar(true)}>
                                    <Image src="/icon/bars-solid.svg" alt="Menu" width={24} height={24} />
                             </button>
                             <h1 className="quiz-title">Thoth</h1>

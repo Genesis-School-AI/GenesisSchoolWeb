@@ -498,7 +498,7 @@
 
 .sidebar .subject-dropdown option:hover,
 .sidebar .subject-dropdown option:checked {
-       background: linear-gradient(135deg, #29b6f6, #1e88e5);
+       background: #0079e2;
        color: #ffffff;
 }
 
@@ -543,4 +543,40 @@
 .popup-inner button:hover {
        background: #1e88e5;
        transform: scale(1.1);
+}
+
+.quizz-link{
+       width: 100%;
+       display: inline-block;
+       padding: 10px 22px;
+       background: linear-gradient(135deg, #29b6f6 0%, #1e88e5 100%);
+       color: #fff;
+       border: none;
+       border-radius: 20px;
+       font-size: 15px;
+       font-weight: 600;
+       cursor: pointer;
+       transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+       box-shadow: 0 2px 8px rgba(41,182,246,0.15);
+       text-align: center;
+       text-decoration: none;
+       outline: none;
+       }
+
+       .quizz-link:hover {
+       background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+       transform: translateY(-2px) scale(1.04);
+       box-shadow: 0 4px 16px rgba(41,182,246,0.22);
+       }
+
+       .quizz-link:active {
+       transform: scale(0.97);
+       }
+
+       .quizz-link:disabled,
+       .quizz-link[aria-disabled="true"] {
+       background: linear-gradient(135deg, #bdbdbd 0%, #9e9e9e 100%);
+       cursor: not-allowed;
+       opacity: 0.7;
+       box-shadow: none;
 }

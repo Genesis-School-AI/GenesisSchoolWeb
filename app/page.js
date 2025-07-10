@@ -18,6 +18,16 @@ export default function Home() {
        const [selectedSubject, setSelectedSubject] = useState('bio'); // Default to biology
        const chatBoxRef = useRef(null);
 
+       // Load saved subject from localStorage on mount
+       useEffect(() => {
+              if (typeof window !== 'undefined') {
+                     const savedSubject = localStorage.getItem('selectedSubject');
+                     if (savedSubject) {
+                            setSelectedSubject(savedSubject);
+                     }
+              }
+       }, []);
+
        // Fetch user session on component mount
        useEffect(() => {
               const fetchUserSession = async () => {
@@ -96,7 +106,7 @@ export default function Home() {
                      });
 
                      if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
+                            throw new Error(`HTTP error! status: ${response.status} - Fetch data {room_id : ${userSession.uroom_id}, room_id : ${userSession.uyear_id}, subject_id : ${selectedSubject}, prompt : ${userPrompt}}`);
                      }
 
                      const data = await response.json();
@@ -149,11 +159,11 @@ export default function Home() {
 
        const handleSubjectChange = (newSubject) => {
               setSelectedSubject(newSubject);
-              // Add a system message to indicate subject change
-              setMessages((prev) => [...prev, { 
-                     type: 'system', 
-                     text: `เปลี่ยนวิชาเป็น: ${getSubjectName(newSubject)}` 
-              }]);
+              // Save to localStorage for persistence
+              if (typeof window !== 'undefined') {
+                     localStorage.setItem('selectedSubject', newSubject);
+              }
+              // Don't add system message - just silently update the subject
        };
 
        const getSubjectName = (subjectId) => {
@@ -170,10 +180,6 @@ export default function Home() {
               return subjects[subjectId] || subjectId;
        };
 
-       const handleQuizNavigation = () => {
-              router.push('/quizz');
-       };
-
        return (
               <div className="page-container">
                      <button className="menuBtn ml-[4px]" onClick={() => setShowSidebar(true)}>
@@ -182,9 +188,6 @@ export default function Home() {
                      <div className="header-content">
                             <h1 className="header">Thoth</h1>
                             <p className="current-subject">วิชา: {getSubjectName(selectedSubject)}</p>
-                            <button className="quiz-nav-btn" onClick={handleQuizNavigation}>
-                                   ทำแบบทดสอบ
-                            </button>
                      </div>
                      <button className="infoBtn mr-[4px]" onClick={() => setShowInfo(true)}>
                             <Image src="\icon\circle-info-solid.svg" alt="Menu" width={24} height={24} />
