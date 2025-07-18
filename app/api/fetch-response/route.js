@@ -12,7 +12,7 @@ export async function POST(request) {
             newprompt: newPrompt || body.prompt
         };
         
-        const response = await fetch('http://127.0.0.1:8690/fetch-gemini', {
+        const response = await fetch('https://genesis.ongor.fun/fetch-gemini', {
        //  const response = await fetch('http://127.0.0.1:8690/fetch-response', {
             method: 'POST',
             headers: {
