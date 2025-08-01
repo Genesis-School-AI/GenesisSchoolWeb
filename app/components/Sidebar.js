@@ -32,12 +32,12 @@ export default function Sidebar({ onClose, userSession, onLogout, selectedSubjec
               { id: 'bio', name: 'ชีวะวิทยา' },
               { id: 'thai', name: 'ไทย' },
               { id: 'math', name: 'คณิต' },
-              { id: 'physics', name: 'ฟิสิกส์' },
-              { id: 'chemistry', name: 'เคมี' },
-              { id: 'english', name: 'อังกฤษ' },
-              { id: 'social', name: 'สังคม' },
-              { id: 'history', name: 'ประวัติศาสตร์' }
-              , { id: 'com', name: 'คอมพิวเตอร์' }
+              { id: 'phy', name: 'ฟิสิกส์' },
+              { id: 'chem', name: 'เคมี' },
+              { id: 'eng', name: 'อังกฤษ' },
+              // { id: 'social', name: 'สังคม' },
+              { id: 'his', name: 'ประวัติศาสตร์' },
+              { id: 'com', name: 'คอมพิวเตอร์' }
        ];
 
        const handleSubjectChange = (e) => {
