@@ -137,7 +137,7 @@ export default function QuizPage() {
                                    'Content-Type': 'application/json',
                             },
                             body: JSON.stringify({
-                                   k: 3,
+                                   k: 10,
                                    room_id: session.uroom_id,
                                    year_id: session.uyear_id,
                                    subject_id: selectedSubject,
