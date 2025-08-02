@@ -241,13 +241,13 @@ export default function QuizPage() {
                                                         return false;
                                                  }
 
-                                                 Content quality validation
+                                                 // Content quality validation
                                                  const question = q.question.trim();
                                                  if (question.length < 10 || question.length > 500) {
                                                         return false;
                                                  }
 
-                                                 Validate each choice
+                                                 // Validate each choice
                                                  const choices = Object.values(q.choices);
                                                  if (choices.some(choice => !choice || choice.trim().length < 2 || choice.trim().length > 200)) {
                                                         return false;
