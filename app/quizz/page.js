@@ -257,23 +257,23 @@ export default function QuizPage() {
                                                  const allText = [question, ...choices].join(' ').toLowerCase();
 
                                                  // Avoid questions with excessive repetition
-                                                 const words = allText.split(/\s+/);
-                                                 const uniqueWords = new Set(words);
-                                                 if (words.length > 5 && uniqueWords.size / words.length < 0.5) {
-                                                        return false;
-                                                 }
-
-                                                 // Check for common nonsense patterns
-                                                 // const nonsensePatterns = [
-                                                 //        /[a-z]{20,}/, // Very long strings without spaces
-                                                 //        /(.)\1{10,}/, // Repeated characters
-                                                 //        /^\s*[a-z]\s*$/i, // Single letter answers
-                                                 //        /^\s*\d+\s*$/, // Pure number questions/answers without context
-                                                 // ];
-
-                                                 // if (nonsensePatterns.some(pattern => pattern.test(allText))) {
+                                                 // const words = allText.split(/\s+/);
+                                                 // const uniqueWords = new Set(words);
+                                                 // if (words.length > 5 && uniqueWords.size / words.length < 0.5) {
                                                  //        return false;
                                                  // }
+
+                                                 Check for common nonsense patterns
+                                                 const nonsensePatterns = [
+                                                        /[a-z]{20,}/, // Very long strings without spaces
+                                                        /(.)\1{10,}/, // Repeated characters
+                                                        /^\s*[a-z]\s*$/i, // Single letter answers
+                                                        /^\s*\d+\s*$/, // Pure number questions/answers without context
+                                                 ];
+
+                                                 if (nonsensePatterns.some(pattern => pattern.test(allText))) {
+                                                        return false;
+                                                 }
 
                                                  return true;
                                           });
