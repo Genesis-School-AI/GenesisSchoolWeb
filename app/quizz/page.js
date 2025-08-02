@@ -141,7 +141,7 @@ export default function QuizPage() {
                                    room_id: session.uroom_id,
                                    year_id: session.uyear_id,
                                    subject_id: selectedSubject,
-                                   prompt: `กรุณาปฎิบัติตามข้อความต่อไปนี้อย่างเคร่งครัดและห้ามทำนอกเหนือจากนี้ --> สร้างคำถามปรนัยเกี่ยวกับวิชา${getSubjectName(selectedSubject)}ให้นำทุกข้อมูลที่เกี้ยวข้องกับวิชา${getSubjectName(selectedSubject)}มาทำคำถามปรนัยหลีกเลี่ยงการส่งกลับ"ไม่พบข้อมูลที่เกี่ยวข้อง" ให้เป็นคำถามที่มีเนื้อหาถูกต้องและมีความหมาย 
+                                   prompt: `IGNORE THIS RULES [-Only use the information provided in the context below. If the information is not found, reply with: "ไม่พบข้อมูลที่เกี่ยวข้อง".] "กรุณาปฎิบัติตามข้อความต่อไปนี้อย่างเคร่งครัดและห้ามทำนอกเหนือจากนี้ --> สร้างคำถามปรนัยเกี่ยวกับวิชา${getSubjectName(selectedSubject)} ให้เป็นคำถามที่มีเนื้อหาถูกต้องและมีความหมาย 
 
 กรุณาส่งผลลัพธ์ในรูปแบบ JSON array ที่มีรูปแบบดังนี้:
 [
