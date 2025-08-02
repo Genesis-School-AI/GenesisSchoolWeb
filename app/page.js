@@ -298,11 +298,11 @@ export default function Home() {
                      'bio': 'ชีวะวิทยา',
                      'thai': 'ไทย',
                      'math': 'คณิต',
-                     'physics': 'ฟิสิกส์',
-                     'chemistry': 'เคมี',
-                     'english': 'อังกฤษ',
+                     'phy': 'ฟิสิกส์',
+                     'chem': 'เคมี',
+                     'eng': 'อังกฤษ',
                      'social': 'สังคม',
-                     'history': 'ประวัติศาสตร์',
+                     'his': 'ประวัติศาสตร์',
                      'com': 'คอมพิวเตอร์',
 
               };
