@@ -263,17 +263,17 @@ export default function QuizPage() {
                                                  //        return false;
                                                  // }
 
-                                                 Check for common nonsense patterns
-                                                 const nonsensePatterns = [
-                                                        /[a-z]{20,}/, // Very long strings without spaces
-                                                        /(.)\1{10,}/, // Repeated characters
-                                                        /^\s*[a-z]\s*$/i, // Single letter answers
-                                                        /^\s*\d+\s*$/, // Pure number questions/answers without context
-                                                 ];
+                                                 // Check for common nonsense patterns
+                                                 // const nonsensePatterns = [
+                                                 //        /[a-z]{20,}/, // Very long strings without spaces
+                                                 //        /(.)\1{10,}/, // Repeated characters
+                                                 //        /^\s*[a-z]\s*$/i, // Single letter answers
+                                                 //        /^\s*\d+\s*$/, // Pure number questions/answers without context
+                                                 // ];
 
-                                                 if (nonsensePatterns.some(pattern => pattern.test(allText))) {
-                                                        return false;
-                                                 }
+                                                 // if (nonsensePatterns.some(pattern => pattern.test(allText))) {
+                                                 //        return false;
+                                                 // }
 
                                                  return true;
                                           });
