@@ -208,7 +208,7 @@ export default function QuizPage() {
                                    aiResponse = data;
                             }
 
-                            console.log('AI Response:', aiResponse); // Debug log
+                            console.log('AI Response:', aiResponse, '- subject', getSubjectName(selectedSubject)); // Debug log
 
                             // Clean the response - remove markdown formatting and extra text
                             aiResponse = aiResponse.replace(/```json/g, '').replace(/```/g, '').trim();
