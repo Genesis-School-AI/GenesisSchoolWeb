@@ -108,7 +108,7 @@ export default function Sidebar({ onClose, userSession, onLogout, selectedSubjec
                                           <p><strong>ชื่อ:</strong> {userSession.ufname} {userSession.ulname}</p>
                                           <p><strong>รหัสนักเรียน:</strong> {userSession.ustudent_id}</p>
                                           <p><strong>ห้อง:</strong> {userSession.uroom_id}</p>
-                                          <p><strong>ปีการศึกษา:</strong> {userSession.uyear_id}</p>
+                                          <p><strong>ชั้นปี:</strong> {userSession.uyear_id}</p>
                                    </div>
                             ) : (
                                    <p>กำลังโหลดข้อมูลผู้ใช้...</p>
